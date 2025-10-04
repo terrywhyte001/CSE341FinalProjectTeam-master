@@ -70,11 +70,17 @@ mongoose.connect(MONGODB_URI)
         process.exit(1);
     });
 
+// --- Root Route - Redirect to API Documentation ---
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
+
 // --- Routes and Documentation ---
 app.use('/', routes);
 
 // Serve swagger.json file
 app.get('/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
     res.sendFile(__dirname + '/swagger.json');
 });
 
