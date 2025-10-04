@@ -1,0 +1,741 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Personal Record Keeper API",
+    "version": "1.0.0",
+    "description": "A simple Express API for managing personal records with MongoDB."
+  },
+  "host": "localhost:3000",
+  "servers": [
+    {
+      "url": "https://cse341finalprojectteam.onrender.com",
+      "description": "Production/Remote Server (Render)"
+    },
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Development Server"
+    }
+  ],
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User registration and session management (Login/Logout)"
+    },
+    {
+      "name": "Records",
+      "description": "CRUD operations for Personal Records"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "securityDefinitions": {
+    "SessionCookie": {
+      "type": "apiKey",
+      "in": "cookie",
+      "name": "connect.sid",
+      "description": "Session cookie for authentication."
+    }
+  },
+  "paths": {
+    "/user/register": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "in": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "required": {
+                  "example": "any"
+                },
+                "schema": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User successfully   and logged in. A session cookie is returned.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User registered and logged in successfully!"
+                },
+                "userId": {
+                  "type": "string",
+                  "example": "60a7d5b1234567890abcdef"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Username and password are required."
+          },
+          "409": {
+            "description": "User already exists."
+          },
+          "500": {
+            "description": "Internal error while registering user."
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "in": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "required": {
+                  "example": "any"
+                },
+                "schema": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully logged in. A session cookie is returned.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Logged in successfully!"
+                },
+                "userId": {
+                  "type": "string",
+                  "example": "60a7d5b1234567890abcdef"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Username and password are required."
+          },
+          "401": {
+            "description": "Invalid credentials."
+          },
+          "500": {
+            "description": "Internal error while logging in."
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Session successfully ended."
+          },
+          "500": {
+            "description": "Internal error while logging out."
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      }
+    },
+    "/user/": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of users.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserResponse"
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the user.",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "404": {
+            "description": "User not found."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Updated user data.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully updated.",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid user ID format or validation error."
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "403": {
+            "description": "Access denied. You can only update your own profile."
+          },
+          "404": {
+            "description": "User not found."
+          },
+          "409": {
+            "description": "Username already exists."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User successfully deleted (No Content)."
+          },
+          "400": {
+            "description": "Invalid user ID format."
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "403": {
+            "description": "Access denied. You can only delete your own profile."
+          },
+          "404": {
+            "description": "User not found."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      }
+    },
+    "/record/": {
+      "post": {
+        "tags": [
+          "Records"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Record data to be created.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RecordUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Record successfully created.",
+            "schema": {
+              "$ref": "#/definitions/Record"
+            }
+          },
+          "400": {
+            "description": "First name is a required field."
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Records"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term for first or last name.",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of records.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Record"
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      }
+    },
+    "/record/{id}": {
+      "get": {
+        "tags": [
+          "Records"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the record.",
+            "schema": {
+              "$ref": "#/definitions/Record"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "404": {
+            "description": "Record not found or access denied."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Records"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Updated record data.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RecordUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record successfully updated.",
+            "schema": {
+              "$ref": "#/definitions/Record"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "404": {
+            "description": "Record not found or access denied."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Records"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Record successfully deleted (No Content)."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Access denied. Please log in."
+          },
+          "404": {
+            "description": "Record not found or access denied."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "UserRegistration": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "testuser"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        }
+      }
+    },
+    "UserUpdate": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "newusername"
+        },
+        "password": {
+          "type": "string",
+          "example": "newpassword123"
+        }
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "60a7d5b1234567890abcdef"
+        },
+        "username": {
+          "type": "string",
+          "example": "testuser"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2023-01-15T10:30:00Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2023-01-15T10:30:00Z"
+        }
+      }
+    },
+    "Record": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "60a7d5b1234567890abcefd0"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "John"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "john.doe@example.com"
+        },
+        "phone": {
+          "type": "string",
+          "example": "555-123-4567"
+        },
+        "birthday": {
+          "type": "string",
+          "example": "1985-05-15"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "street": {
+              "type": "string",
+              "example": "123 Main St"
+            },
+            "city": {
+              "type": "string",
+              "example": "Anytown"
+            },
+            "state": {
+              "type": "string",
+              "example": "CA"
+            },
+            "zipCode": {
+              "type": "string",
+              "example": "12345"
+            },
+            "country": {
+              "type": "string",
+              "example": "USA"
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "example": "Important client contact"
+        },
+        "ownerId": {
+          "type": "string",
+          "example": "60a7d5b1234567890abcdef"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2023-01-15T10:30:00Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2023-01-15T10:30:00Z"
+        }
+      }
+    },
+    "RecordUpdate": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "example": "Jane"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Smith"
+        },
+        "email": {
+          "type": "string",
+          "example": "jane.smith@example.com"
+        },
+        "phone": {
+          "type": "string",
+          "example": "555-987-6543"
+        },
+        "birthday": {
+          "type": "string",
+          "example": "1995-10-20"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "street": {
+              "type": "string",
+              "example": "456 Oak Ave"
+            },
+            "city": {
+              "type": "string",
+              "example": "Somewhere"
+            },
+            "state": {
+              "type": "string",
+              "example": "NY"
+            },
+            "zipCode": {
+              "type": "string",
+              "example": "67890"
+            },
+            "country": {
+              "type": "string",
+              "example": "USA"
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "example": "Updated contact information"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Error description"
+        }
+      }
+    }
+  }
+}
