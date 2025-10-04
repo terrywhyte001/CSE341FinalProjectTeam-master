@@ -6,12 +6,19 @@ const session = require('express-session');
 const cors = require('cors'); 
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
+const path = require('path');
 
-dotenv.config();
+// Load environment variables with explicit path
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 const MONGODB_URI = process.env.MONGODB_URI;
+
+// Debug: Log environment variables (remove in production)
+console.log('Environment check:');
+console.log('MONGODB_URI:', MONGODB_URI ? 'Found' : 'Missing');
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'Found' : 'Missing');
 
 // Your domain on Render (HTTPS protocol is implied for Render)
 const DEPLOY_ORIGIN = 'https://cse341finalprojectteam.onrender.com';
@@ -34,7 +41,7 @@ app.use(express.json());
 
 // Session Configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET, 
+    secret: process.env.SESSION_SECRET || 'fallback-secret-for-development', 
     resave: false,
     saveUninitialized: false,
     cookie: { 
@@ -50,9 +57,18 @@ app.use(session({
 }));
 
 // --- MongoDB Connection ---
+if (!MONGODB_URI) {
+    console.error('ERROR: MONGODB_URI environment variable is not set!');
+    console.log('Please check your .env file and make sure MONGODB_URI is defined.');
+    process.exit(1);
+}
+
 mongoose.connect(MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB!'))
-    .catch(err => console.error('Connection error to MongoDB:', err.message));
+    .then(() => console.log('✅ Connected to MongoDB successfully!'))
+    .catch(err => {
+        console.error('❌ Connection error to MongoDB:', err.message);
+        process.exit(1);
+    });
 
 // --- Routes and Documentation ---
 app.use('/', routes);
@@ -79,9 +95,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOp
 
 // --- Error Handling Middleware ---
 // 404 handler for undefined routes
-app.use('*', (req, res) => {
+app.use((req, res, next) => {
     res.status(404).json({ 
         message: 'Route not found', 
+        path: req.path,
+        method: req.method,
         availableRoutes: {
             documentation: '/api-docs',
             users: '/user',

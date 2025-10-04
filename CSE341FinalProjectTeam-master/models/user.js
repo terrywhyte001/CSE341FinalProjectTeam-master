@@ -27,7 +27,7 @@ const userSchema = new Schema({
     timestamps: true // Adds createdAt and updatedAt fields
 });
 
-// Index for better query performance
-userSchema.index({ username: 1 });
+// Note: Username index is automatically created by the 'unique: true' option above
+// No need for manual index definition
 
 module.exports = mongoose.model('User', userSchema);
