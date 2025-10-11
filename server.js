@@ -7,7 +7,7 @@ const cors = require('cors');
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
 const path = require('path');
-// const passport = require('./config/passport'); // Temporarily commented out
+const passport = require('./config/passport');
 
 // Load environment variables with explicit path
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -59,9 +59,9 @@ app.use(session({
     } 
 }));
 
-// Initialize Passport middleware (temporarily commented out)
-// app.use(passport.initialize());
-// app.use(passport.session());
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // --- MongoDB Connection ---
 if (!MONGODB_URI) {
@@ -78,7 +78,7 @@ mongoose.connect(MONGODB_URI)
     });
 
 // --- Routes and Documentation ---
-// app.use('/auth', require('./routes/auth')); // OAuth routes (temporarily commented out)
+app.use('/auth', require('./routes/auth')); // OAuth routes
 app.use('/', routes);
 
 // Serve swagger.json file
@@ -130,3 +130,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API documentation at http://localhost:${PORT}/api-docs`);
 });
+
+// Export app for testing
+module.exports = app;
