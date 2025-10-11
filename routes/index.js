@@ -2,6 +2,11 @@
 const express = require('express');
 const router = express.Router();
 
+// Root route - Redirect to API documentation
+router.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
+
 // Routes for /user (Registration, Login, Logout)
 router.use('/user', require('./users'));
 
