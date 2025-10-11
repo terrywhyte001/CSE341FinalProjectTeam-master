@@ -18,10 +18,41 @@ const userSchema = new Schema({
             message: 'Username can only contain letters, numbers, and underscores'
         }
     },
-    password: { // Password HASHED!
+    password: { // Password HASHED! (optional for OAuth users)
         type: String,
-        required: [true, 'Password is required'],
+        required: function() {
+            // Password required only for local authentication
+            return !this.googleId && !this.githubId;
+        },
         minlength: [6, 'Password must be at least 6 characters long']
+    },
+    email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        validate: {
+            validator: function(email) {
+                if (!email) return true;
+                return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+            },
+            message: 'Please enter a valid email address'
+        }
+    },
+    // OAuth fields
+    googleId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    githubId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google', 'github'],
+        default: 'local'
     }
 }, {
     timestamps: true // Adds createdAt and updatedAt fields

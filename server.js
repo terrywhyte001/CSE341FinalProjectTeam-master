@@ -7,6 +7,7 @@ const cors = require('cors');
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
 const path = require('path');
+// const passport = require('./config/passport'); // Temporarily commented out
 
 // Load environment variables with explicit path
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -19,6 +20,8 @@ const MONGODB_URI = process.env.MONGODB_URI;
 console.log('Environment check:');
 console.log('MONGODB_URI:', MONGODB_URI ? 'Found' : 'Missing');
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'Found' : 'Missing');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'Found' : 'Missing');
+console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'Found' : 'Missing');
 
 // Your domain on Render (HTTPS protocol is implied for Render)
 const DEPLOY_ORIGIN = 'https://cse341finalprojectteam.onrender.com';
@@ -56,6 +59,10 @@ app.use(session({
     } 
 }));
 
+// Initialize Passport middleware (temporarily commented out)
+// app.use(passport.initialize());
+// app.use(passport.session());
+
 // --- MongoDB Connection ---
 if (!MONGODB_URI) {
     console.error('ERROR: MONGODB_URI environment variable is not set!');
@@ -71,6 +78,7 @@ mongoose.connect(MONGODB_URI)
     });
 
 // --- Routes and Documentation ---
+// app.use('/auth', require('./routes/auth')); // OAuth routes (temporarily commented out)
 app.use('/', routes);
 
 // Serve swagger.json file
